@@ -1,0 +1,34 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: social-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: social-service
+    rules:
+    - alert: SocialServiceUnavailable
+      expr: up{namespace="badminton",service="social-service"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: social-service scrape target unavailable
+    - alert: SocialServiceHighErrorRate
+      expr: sum(rate(social_service_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(social_service_http_requests_total[5m])),
+        0.001) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+    - alert: SocialServiceHighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(social_service_http_duration_seconds_bucket[5m]))) > 2
+      for: 5m
+      labels:
+        severity: warning
+    - alert: UnauthorizedRoomAttempts
+      expr: sum(rate(social_unauthorized_room_attempts_total[5m])) > 0.1
+      for: 5m
+      labels:
+        severity: warning

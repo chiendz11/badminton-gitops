@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- service-account.yaml
+- deployment.yaml
+- service.yaml
+- hpa.yaml
+- pdb.yaml
+- network-policy.yaml
+configMapGenerator:
+- name: web-config
+  namespace: badminton
+  literals:
+  - PORT=8080
+  - NODE_ENV=production
+  - LOG_LEVEL=info
+  - JWT_ISSUER=badminton-identity
+  - JWT_AUDIENCE=badminton-system
+  - CORS_ORIGINS=https://badminton.example.com,https://admin.badminton.example.com
+  - API_GATEWAY_URL=http://api-gateway:8081
+- name: web-nginx
+  namespace: badminton
+  files:
+  - nginx.conf
+generatorOptions:
+  disableNameSuffixHash: false
+images:
+- name: badminton-web
+  newName: UNCONFIGURED_IMAGE_REPOSITORY
+  newTag: unreleased

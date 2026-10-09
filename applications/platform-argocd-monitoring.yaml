@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-argocd-monitoring
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-39'
+spec:
+  project: badminton-production
+  source:
+    repoURL: https://github.com/chiendz11/badminton-gitops.git
+    targetRevision: main
+    path: platform/argocd-monitoring
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

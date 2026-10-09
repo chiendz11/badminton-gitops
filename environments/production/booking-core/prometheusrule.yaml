@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: booking-core
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: booking-core
+    rules:
+    - alert: BookingCoreUnavailable
+      expr: up{namespace="badminton",service="booking-core"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: booking-core scrape target unavailable
+    - alert: BookingCoreHighErrorRate
+      expr: sum(rate(booking_core_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(booking_core_http_requests_total[5m])),
+        0.001) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+    - alert: BookingCoreHighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(booking_core_http_duration_seconds_bucket[5m])))
+        > 2
+      for: 5m
+      labels:
+        severity: warning
+    - alert: BookingDatabaseUnavailable
+      expr: booking_core_database_up == 0
+      for: 5m
+      labels:
+        severity: warning
+    - alert: BookingConflictSpike
+      expr: sum(rate(booking_core_conflicts_total[5m])) > 1
+      for: 5m
+      labels:
+        severity: warning
+    - alert: PaymentWebhookFailures
+      expr: sum(rate(payment_webhook_failure_total[5m])) > 0.1
+      for: 5m
+      labels:
+        severity: warning

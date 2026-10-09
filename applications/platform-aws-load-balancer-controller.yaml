@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-aws-load-balancer-controller
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-38'
+spec:
+  project: badminton-production
+  source:
+    repoURL: https://aws.github.io/eks-charts
+    targetRevision: 1.14.0
+    chart: aws-load-balancer-controller
+    helm:
+      releaseName: aws-load-balancer-controller
+      valuesObject:
+        clusterName: UNCONFIGURED_CLUSTER
+        region: ap-southeast-1
+        vpcId: UNCONFIGURED_VPC
+        replicaCount: 2
+        serviceAccount:
+          create: true
+          name: aws-load-balancer-controller
+          annotations:
+            eks.amazonaws.com/role-arn: UNCONFIGURED_ROLE_ARN
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

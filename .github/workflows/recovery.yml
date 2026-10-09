@@ -1,0 +1,100 @@
+name: Recovery PR
+'on':
+  workflow_dispatch:
+    inputs:
+      component:
+        required: true
+        type: choice
+        options:
+        - web
+        - admin
+        - api-gateway
+        - identity-service
+        - booking-core
+        - commerce-service
+        - social-service
+        - content-service
+        - notification-service
+        - storage-service
+        - ai-service
+      historical_commit:
+        description: Full GitOps commit SHA with known release history
+        required: true
+        type: string
+      reason:
+        required: true
+        type: string
+env:
+  PR_BRANCH: recovery/production
+  PR_TITLE: Recover production workload from verified release history
+concurrency:
+  group: production-gitops-writer
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    environment: production-automation
+    permissions:
+      contents: read
+      id-token: write
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+        fetch-depth: 0
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install contract dependencies
+      run: python -m pip install -r requirements.txt
+    - name: Create automation GitHub App token
+      id: app
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.AUTOMATION_APP_ID }}
+        private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+        owner: chiendz11
+        repositories: badminton-gitops
+        permission-contents: write
+        permission-pull-requests: write
+    - name: Create read-only app provenance token
+      id: source
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.AUTOMATION_APP_ID }}
+        private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+        owner: chiendz11
+        repositories: badminton_system
+        permission-contents: read
+        permission-actions: read
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ vars.RELEASE_VERIFIER_ROLE_ARN }}
+        aws-region: ${{ vars.AWS_REGION }}
+    - uses: sigstore/cosign-installer@v3
+      with:
+        cosign-release: v2.5.3
+    - uses: aws-actions/amazon-ecr-login@v2
+    - name: Verify and restore historical release
+      env:
+        APP_CI_WORKFLOW: ${{ vars.APP_CI_WORKFLOW || 'ci.yml' }}
+        IMAGE_SIGNER_IDENTITY: ${{ vars.IMAGE_SIGNER_IDENTITY }}
+        GH_TOKEN: ${{ steps.source.outputs.token }}
+        RECOVERY_COMPONENT: ${{ inputs.component }}
+        RECOVERY_COMMIT: ${{ inputs.historical_commit }}
+        RECOVERY_REASON: ${{ inputs.reason }}
+      run: |-
+        python -m automation.recovery.renderer
+        python -m automation.policy_check
+    - name: Open review PR
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ steps.app.outputs.token }}
+        branch: ${{ env.PR_BRANCH }}
+        base: main
+        commit-message: ${{ env.PR_TITLE }}
+        title: ${{ env.PR_TITLE }}
+        body: Automated change to production desired state. Review the contract, rendered manifests and image provenance before
+          merging. Argo CD reconciles after merge.
+        delete-branch: true

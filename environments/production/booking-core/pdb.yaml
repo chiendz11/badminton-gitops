@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: booking-core
+  namespace: badminton
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: booking-core
+      app.kubernetes.io/component: runtime

@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  namespace: badminton
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: web
+      app.kubernetes.io/component: runtime

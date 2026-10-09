@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- service-account.yaml
+- external-secret.yaml
+- deployment.yaml
+- service.yaml
+- hpa.yaml
+- pdb.yaml
+- network-policy.yaml
+- migration-job.yaml
+- servicemonitor.yaml
+- prometheusrule.yaml
+configMapGenerator:
+- name: commerce-service-config
+  namespace: badminton
+  literals:
+  - PORT=3000
+  - NODE_ENV=production
+  - LOG_LEVEL=info
+  - JWT_ISSUER=badminton-identity
+  - JWT_AUDIENCE=badminton-system
+  - CORS_ORIGINS=https://badminton.example.com,https://admin.badminton.example.com
+  - RABBITMQ_ENDPOINT=UNCONFIGURED_AMQPS_ENDPOINT
+  - RABBITMQ_VHOST=/badminton
+generatorOptions:
+  disableNameSuffixHash: false
+images:
+- name: badminton-commerce-service
+  newName: UNCONFIGURED_IMAGE_REPOSITORY
+  newTag: unreleased
+- name: badminton-commerce-service-migrations
+  newName: UNCONFIGURED_IMAGE_REPOSITORY
+  newTag: unreleased

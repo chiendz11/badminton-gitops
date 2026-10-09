@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-external-dns
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-37'
+spec:
+  project: badminton-production
+  source:
+    repoURL: https://kubernetes-sigs.github.io/external-dns/
+    targetRevision: 1.21.1
+    chart: external-dns
+    helm:
+      releaseName: external-dns
+      valuesObject:
+        provider:
+          name: aws
+        sources:
+        - ingress
+        policy: upsert-only
+        registry: txt
+        txtOwnerId: badminton-prod
+        domainFilters:
+        - badminton.example.com
+        extraArgs:
+          aws-zone-type: public
+          zone-id-filter: UNCONFIGURED_ZONE
+        serviceAccount:
+          create: true
+          name: external-dns
+          annotations:
+            eks.amazonaws.com/role-arn: UNCONFIGURED_ROLE_ARN
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-dns
+  syncPolicy:
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,88 @@
+name: Platform reconcile PR
+'on':
+  repository_dispatch:
+    types:
+    - platform-contract-v1
+  workflow_dispatch:
+    inputs:
+      contract:
+        description: Non-secret platform contract v1 JSON
+        required: true
+        type: string
+  schedule:
+  - cron: '*/30 * * * *'
+concurrency:
+  group: production-gitops-writer
+  cancel-in-progress: false
+env:
+  PR_BRANCH: platform/reconcile
+  PR_TITLE: Reconcile production platform contract and managed endpoint policies
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    environment: production-automation
+    permissions:
+      contents: read
+      id-token: write
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+    - name: Check initial platform readiness
+      id: ready
+      run: |
+        python - <<'PY'
+        import json, os
+        configured = json.load(open('state/production-platform.json')).get('configured') is not False
+        ready = os.environ['GITHUB_EVENT_NAME'] != 'schedule' or configured
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+            out.write(f'run={str(ready).lower()}\n')
+        PY
+    - name: Check dispatch sender
+      if: steps.ready.outputs.run == 'true' && (github.event_name == 'repository_dispatch')
+      env:
+        EXPECTED_SENDER: ${{ vars.DISPATCH_SENDER }}
+        ACTUAL_SENDER: ${{ github.event.sender.login }}
+      run: test -n "$EXPECTED_SENDER" && test "$ACTUAL_SENDER" = "$EXPECTED_SENDER"
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+      if: steps.ready.outputs.run == 'true'
+    - name: Install contract dependencies
+      run: python -m pip install -r requirements.txt
+      if: steps.ready.outputs.run == 'true'
+    - name: Create automation GitHub App token
+      id: app
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.AUTOMATION_APP_ID }}
+        private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+        owner: chiendz11
+        repositories: badminton-gitops
+        permission-contents: write
+        permission-pull-requests: write
+      if: steps.ready.outputs.run == 'true'
+    - name: Read platform contract
+      run: python -m automation.event_payload
+      if: steps.ready.outputs.run == 'true' && (github.event_name != 'schedule')
+    - name: Reuse current contract for dependency DNS refresh
+      if: steps.ready.outputs.run == 'true' && (github.event_name == 'schedule')
+      run: cp state/production-platform.json payload.json
+    - name: Render platform without changing image digests
+      run: |-
+        python -m automation.platform_reconcile.renderer payload.json
+        python -m automation.policy_check
+      if: steps.ready.outputs.run == 'true'
+    - name: Open review PR
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ steps.app.outputs.token }}
+        branch: ${{ env.PR_BRANCH }}
+        base: main
+        commit-message: ${{ env.PR_TITLE }}
+        title: ${{ env.PR_TITLE }}
+        body: Automated change to production desired state. Review the contract, rendered manifests and image provenance before
+          merging. Argo CD reconciles after merge.
+        delete-branch: true
+      if: steps.ready.outputs.run == 'true'

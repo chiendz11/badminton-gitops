@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: notification-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: notification-service
+    rules:
+    - alert: NotificationServiceUnavailable
+      expr: up{namespace="badminton",service="notification-service"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: notification-service scrape target unavailable
+    - alert: NotificationServiceHighErrorRate
+      expr: sum(rate(notification_service_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(notification_service_http_requests_total[5m])),
+        0.001) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+    - alert: NotificationServiceHighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(notification_service_http_duration_seconds_bucket[5m])))
+        > 2
+      for: 5m
+      labels:
+        severity: warning
+    - alert: QueueDepthHigh
+      expr: rabbitmq_queue_messages_ready > 1000
+      for: 5m
+      labels:
+        severity: warning
+    - alert: DLQNotEmpty
+      expr: rabbitmq_queue_messages_ready{queue=~".*dlq.*"} > 0
+      for: 5m
+      labels:
+        severity: warning
+    - alert: ConsumerLagHigh
+      expr: rabbitmq_queue_messages_unacked > 500
+      for: 5m
+      labels:
+        severity: warning

@@ -1,0 +1,39 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ai-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: ai-service
+    rules:
+    - alert: AiServiceUnavailable
+      expr: up{namespace="badminton",service="ai-service"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: ai-service scrape target unavailable
+    - alert: AiServiceHighErrorRate
+      expr: sum(rate(ai_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(ai_http_requests_total[5m])),
+        0.001) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+    - alert: AiServiceHighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(ai_http_duration_seconds_bucket[5m]))) > 2
+      for: 5m
+      labels:
+        severity: warning
+    - alert: AIToolFailureRate
+      expr: sum(rate(ai_tool_calls_total{outcome!="success"}[5m])) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+    - alert: AIFallbackRateHigh
+      expr: sum(rate(ai_fallback_total[5m])) > 0.1
+      for: 5m
+      labels:
+        severity: warning

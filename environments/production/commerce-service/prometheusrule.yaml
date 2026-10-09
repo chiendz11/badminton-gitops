@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: commerce-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: commerce-service
+    rules:
+    - alert: CommerceServiceUnavailable
+      expr: up{namespace="badminton",service="commerce-service"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: commerce-service scrape target unavailable
+    - alert: CommerceServiceHighErrorRate
+      expr: sum(rate(commerce_service_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(commerce_service_http_requests_total[5m])),
+        0.001) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+    - alert: CommerceServiceHighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(commerce_service_http_duration_seconds_bucket[5m]))) > 2
+      for: 5m
+      labels:
+        severity: warning

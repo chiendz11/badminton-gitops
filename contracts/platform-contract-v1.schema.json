@@ -1,0 +1,418 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "environment": {
+      "const": "production"
+    },
+    "aws_region": {
+      "type": "string",
+      "pattern": "^[a-z]{2}-[a-z]+-[0-9]+$"
+    },
+    "cluster_name": {
+      "const": "badminton-prod"
+    },
+    "cluster_endpoint": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "vpc_id": {
+      "type": "string",
+      "pattern": "^vpc-[a-f0-9]+$"
+    },
+    "vpc_cidr": {
+      "type": "string",
+      "pattern": "^[0-9.]+/[0-9]+$"
+    },
+    "ecr": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "web": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "admin": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "api-gateway": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "identity-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "booking-core": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "commerce-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "social-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "content-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "notification-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "storage-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        },
+        "ai-service": {
+          "type": "string",
+          "pattern": "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/badminton-prod/[a-z0-9-]+$"
+        }
+      },
+      "required": [
+        "web",
+        "admin",
+        "api-gateway",
+        "identity-service",
+        "booking-core",
+        "commerce-service",
+        "social-service",
+        "content-service",
+        "notification-service",
+        "storage-service",
+        "ai-service"
+      ]
+    },
+    "database": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "host": {
+              "type": "string",
+              "minLength": 1
+            },
+            "port": {
+              "const": 5432
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secret_arn": {
+              "type": "string",
+              "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+            }
+          },
+          "required": [
+            "host",
+            "port",
+            "name",
+            "secret_arn"
+          ]
+        },
+        "booking": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "host": {
+              "type": "string",
+              "minLength": 1
+            },
+            "port": {
+              "const": 5432
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secret_arn": {
+              "type": "string",
+              "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+            }
+          },
+          "required": [
+            "host",
+            "port",
+            "name",
+            "secret_arn"
+          ]
+        },
+        "commerce": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "host": {
+              "type": "string",
+              "minLength": 1
+            },
+            "port": {
+              "const": 5432
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secret_arn": {
+              "type": "string",
+              "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+            }
+          },
+          "required": [
+            "host",
+            "port",
+            "name",
+            "secret_arn"
+          ]
+        },
+        "ai": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "host": {
+              "type": "string",
+              "minLength": 1
+            },
+            "port": {
+              "const": 5432
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secret_arn": {
+              "type": "string",
+              "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+            }
+          },
+          "required": [
+            "host",
+            "port",
+            "name",
+            "secret_arn"
+          ]
+        }
+      },
+      "required": [
+        "identity",
+        "booking",
+        "commerce"
+      ]
+    },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "port": {
+          "const": 6379
+        },
+        "tls": {
+          "const": true
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "tls"
+      ]
+    },
+    "messaging": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "pattern": "^amqps://"
+        }
+      },
+      "required": [
+        "endpoint"
+      ]
+    },
+    "secret_arns": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "payos": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "cloudinary": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "llm": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "internal-service-auth": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "rabbitmq": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "redis": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "mongodb": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "oauth": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "api-gateway-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "identity-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "booking-core-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "commerce-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "social-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "content-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "notification-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "storage-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        },
+        "ai-service-runtime": {
+          "type": "string",
+          "pattern": "^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+        }
+      },
+      "required": [
+        "payos",
+        "cloudinary",
+        "llm",
+        "internal-service-auth",
+        "rabbitmq",
+        "redis",
+        "mongodb",
+        "oauth",
+        "api-gateway-runtime",
+        "identity-service-runtime",
+        "booking-core-runtime",
+        "commerce-service-runtime",
+        "social-service-runtime",
+        "content-service-runtime",
+        "notification-service-runtime",
+        "storage-service-runtime",
+        "ai-service-runtime"
+      ]
+    },
+    "irsa": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "external_secrets": {
+          "type": "string",
+          "pattern": "^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$"
+        },
+        "external_dns": {
+          "type": "string",
+          "pattern": "^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$"
+        },
+        "aws_load_balancer_controller": {
+          "type": "string",
+          "pattern": "^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$"
+        }
+      },
+      "required": [
+        "external_secrets",
+        "external_dns",
+        "aws_load_balancer_controller"
+      ]
+    },
+    "public": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+\\.[a-z]{2,}$"
+        },
+        "admin_domain": {
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+\\.[a-z]{2,}$"
+        },
+        "certificate_arn": {
+          "type": "string",
+          "pattern": "^arn:aws:acm:[a-z0-9-]+:[0-9]{12}:certificate/[a-f0-9-]+$"
+        },
+        "zone_id": {
+          "type": "string",
+          "pattern": "^Z[A-Z0-9]+$"
+        }
+      },
+      "required": [
+        "domain",
+        "admin_domain",
+        "certificate_arn",
+        "zone_id"
+      ]
+    },
+    "mongodb_allowed_cidrs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9.]+/[0-9]+$"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "environment",
+    "aws_region",
+    "cluster_name",
+    "cluster_endpoint",
+    "vpc_id",
+    "vpc_cidr",
+    "ecr",
+    "database",
+    "cache",
+    "messaging",
+    "secret_arns",
+    "irsa",
+    "public",
+    "mongodb_allowed_cidrs"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/chiendz11/badminton-infras/contracts/platform-contract-v1.schema.json"
+}

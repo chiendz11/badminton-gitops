@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- project.yaml
+- platform-namespaces.yaml
+- platform-external-secrets.yaml
+- platform-external-secrets-config.yaml
+- platform-metrics-server.yaml
+- platform-monitoring.yaml
+- platform-aws-load-balancer-controller.yaml
+- platform-external-dns.yaml
+- platform-cert-manager.yaml
+- platform-storage.yaml
+- platform-policies.yaml
+- platform-argocd-monitoring.yaml
+- workload-web.yaml
+- workload-admin.yaml
+- workload-api-gateway.yaml
+- workload-identity-service.yaml
+- workload-booking-core.yaml
+- workload-commerce-service.yaml
+- workload-social-service.yaml
+- workload-content-service.yaml
+- workload-notification-service.yaml
+- workload-storage-service.yaml
+- workload-ai-service.yaml
+- workload-edge.yaml
