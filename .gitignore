@@ -1,0 +1,15 @@
+.terraform/
+*.tfstate*
+*.tfplan
+*.auto.tfvars
+backend.hcl
+!backend.hcl.example
+.env
+.venv/
+__pycache__/
+outputs.json
+platform-contract-v1.json
+payload.json
+*.local.tfvars
+terraform.tfvars
+dispatch.json
