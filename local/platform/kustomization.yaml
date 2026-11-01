@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: badminton
 resources:
 - postgres.yaml
+- mongo.yaml
 configMapGenerator:
 - name: postgres-init-script
   files:
