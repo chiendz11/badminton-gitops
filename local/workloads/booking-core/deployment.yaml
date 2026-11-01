@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-core
+  namespace: badminton
+  labels:
+    app: booking-core
+    badminton.io/part-of: badminton-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-core
+  template:
+    metadata:
+      labels:
+        app: booking-core
+        badminton.io/part-of: badminton-local
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: booking-core
+        image: registry.invalid/badminton-local/booking-core:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: booking-core-config
+        - secretRef:
+            name: booking-core-secrets
+        startupProbe:
+          httpGet:
+            path: /health/live
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: http
+          periodSeconds: 10
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+

@@ -5,6 +5,8 @@
 backend.hcl
 !backend.hcl.example
 .env
+.local/
+local/.local/
 .venv/
 __pycache__/
 outputs.json

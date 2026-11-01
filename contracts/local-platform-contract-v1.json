@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "architecture_revision": "badminton-local-gitops/1.0.0",
+  "namespace": "badminton",
+  "cluster_name": "badminton-local",
+  "context": "k3d-badminton-local",
+  "api_server": "https://127.0.0.1:6555",
+  "argocd_namespace": "argocd",
+  "ports": {
+    "gateway": [
+      18081,
+      30081
+    ],
+    "web": [
+      18082,
+      30082
+    ],
+    "admin": [
+      18083,
+      30083
+    ],
+    "argocd": [
+      19445,
+      30443
+    ],
+    "postgres": [
+      15432,
+      30432
+    ]
+  },
+  "applications": {
+    "platform": "environments/local/platform",
+    "apps": "environments/local/apps"
+  },
+  "database": {
+    "host": "postgres.badminton.svc.cluster.local",
+    "port": 5432,
+    "booking_db": "booking",
+    "booking_user": "booking",
+    "ai_db": "ai",
+    "ai_user": "ai"
+  }
+}

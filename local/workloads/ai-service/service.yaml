@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-service
+  namespace: badminton
+  labels:
+    app: ai-service
+    badminton.io/part-of: badminton-local
+spec:
+  selector:
+    app: ai-service
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+

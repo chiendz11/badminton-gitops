@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: badminton
+resources:
+- deployment.yaml
+- service.yaml
+configMapGenerator:
+- name: booking-core-config
+  literals:
+  - PORT=3000
+  - NODE_ENV=development
+  - LOG_LEVEL=info
+  - JWT_ISSUER=badminton-identity
+  - JWT_AUDIENCE=badminton-system
+  - ENABLE_DEMO_AUTH=true
+  - CORS_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:8082,http://localhost:8083,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:8082,http://127.0.0.1:8083,http://127.0.0.1:18082,http://127.0.0.1:18083
+generatorOptions:
+  disableNameSuffixHash: true
+

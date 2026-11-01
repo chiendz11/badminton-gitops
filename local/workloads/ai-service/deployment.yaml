@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-service
+  namespace: badminton
+  labels:
+    app: ai-service
+    badminton.io/part-of: badminton-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-service
+  template:
+    metadata:
+      labels:
+        app: ai-service
+        badminton.io/part-of: badminton-local
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: ai-service
+        image: registry.invalid/badminton-local/ai-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: ai-service-config
+        - secretRef:
+            name: ai-service-secrets
+        startupProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+          periodSeconds: 10
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+
