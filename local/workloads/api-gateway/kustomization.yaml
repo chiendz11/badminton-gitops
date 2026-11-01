@@ -10,6 +10,8 @@ configMapGenerator:
   - PORT=8081
   - NODE_ENV=development
   - BOOKING_CORE_URL=http://booking-core:3000
+  - CONTENT_SERVICE_URL=http://content-service:3001
+  - CONTENT_UPSTREAM_TIMEOUT_MS=5000
   - AI_SERVICE_URL=http://ai-service:8000
   - AI_UPSTREAM_TIMEOUT_MS=45000
   - JWT_ISSUER=badminton-identity

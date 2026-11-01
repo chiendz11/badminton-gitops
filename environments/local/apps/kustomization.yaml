@@ -5,5 +5,6 @@ resources:
 - ../../../local/workloads/booking-core
 - ../../../local/workloads/ai-service
 - ../../../local/workloads/api-gateway
+- ../../../local/workloads/content-service
 - ../../../local/workloads/web
 - ../../../local/workloads/admin

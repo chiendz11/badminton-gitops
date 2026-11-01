@@ -99,10 +99,10 @@
     "content-service": {
       "dockerfile": "services/content-service/Dockerfile",
       "context": ".",
-      "port": 3000,
+      "port": 3001,
       "kind": "Deployment",
-      "source_status": "stub",
-      "default_enabled": false,
+      "source_status": "implemented",
+      "default_enabled": true,
       "migration": null
     },
     "identity-service": {
