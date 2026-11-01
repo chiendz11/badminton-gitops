@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: badminton
 resources:
 - ../../../local/platform
-

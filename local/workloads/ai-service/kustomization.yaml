@@ -16,4 +16,3 @@ configMapGenerator:
   - PROPOSAL_TTL_SECONDS=300
 generatorOptions:
   disableNameSuffixHash: true
-

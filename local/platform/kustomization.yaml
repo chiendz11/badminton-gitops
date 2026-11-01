@@ -7,4 +7,3 @@ configMapGenerator:
 - name: postgres-init-script
   files:
   - init.sql=init-script.sql
-

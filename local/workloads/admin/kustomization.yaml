@@ -4,4 +4,3 @@ namespace: badminton
 resources:
 - deployment.yaml
 - service.yaml
-
