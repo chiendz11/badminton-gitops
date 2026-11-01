@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "cluster": "badminton-local",
+  "components": [
+    "booking-core",
+    "ai-service",
+    "api-gateway",
+    "web",
+    "admin"
+  ]
+}
+

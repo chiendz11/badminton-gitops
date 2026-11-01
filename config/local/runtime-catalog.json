@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0.0",
+  "components": {
+    "booking-core": {
+      "dockerfile": "services/booking-core/Dockerfile",
+      "context": ".",
+      "command": [
+        "dumb-init",
+        "node",
+        "dist/main.js"
+      ],
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "implemented",
+      "default_enabled": true,
+      "migration": {
+        "dockerfile": "services/booking-core/Dockerfile",
+        "target": "build",
+        "command": [
+          "sh",
+          "-c",
+          "pnpm --filter @badminton/booking-core prisma:migrate:deploy && pnpm --filter @badminton/booking-core seed"
+        ]
+      }
+    },
+    "ai-service": {
+      "dockerfile": "services/ai-service/Dockerfile",
+      "context": ".",
+      "command": [
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "port": 8000,
+      "kind": "Deployment",
+      "source_status": "implemented",
+      "default_enabled": true,
+      "migration": {
+        "command": [
+          "sh",
+          "-c",
+          "alembic upgrade head && python -m app.migrate"
+        ]
+      }
+    },
+    "api-gateway": {
+      "dockerfile": "services/api-gateway/Dockerfile",
+      "context": ".",
+      "command": [
+        "node",
+        "dist/main.js"
+      ],
+      "port": 8081,
+      "kind": "Deployment",
+      "source_status": "implemented",
+      "default_enabled": true,
+      "migration": null
+    },
+    "web": {
+      "dockerfile": "apps/web/Dockerfile",
+      "context": ".",
+      "command": [
+        "nginx",
+        "-g",
+        "daemon off;"
+      ],
+      "port": 80,
+      "kind": "Deployment",
+      "source_status": "implemented",
+      "default_enabled": true,
+      "migration": null
+    },
+    "admin": {
+      "dockerfile": "apps/admin/Dockerfile",
+      "context": ".",
+      "command": [
+        "nginx",
+        "-g",
+        "daemon off;"
+      ],
+      "port": 80,
+      "kind": "Deployment",
+      "source_status": "implemented",
+      "default_enabled": true,
+      "migration": null
+    },
+    "commerce-service": {
+      "dockerfile": "services/commerce-service/Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "stub",
+      "default_enabled": false,
+      "migration": null
+    },
+    "content-service": {
+      "dockerfile": "services/content-service/Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "stub",
+      "default_enabled": false,
+      "migration": null
+    },
+    "identity-service": {
+      "dockerfile": "services/identity-service/Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "stub",
+      "default_enabled": false,
+      "migration": null
+    },
+    "notification-service": {
+      "dockerfile": "services/notification-service/Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "stub",
+      "default_enabled": false,
+      "migration": null
+    },
+    "social-service": {
+      "dockerfile": "services/social-service/Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "stub",
+      "default_enabled": false,
+      "migration": null
+    },
+    "storage-service": {
+      "dockerfile": "services/storage-service/Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "kind": "Deployment",
+      "source_status": "stub",
+      "default_enabled": false,
+      "migration": null
+    }
+  }
+}
