@@ -2,9 +2,28 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: badminton
 resources:
-- ../../../local/workloads/booking-core
-- ../../../local/workloads/ai-service
-- ../../../local/workloads/api-gateway
-- ../../../local/workloads/content-service
-- ../../../local/workloads/web
-- ../../../local/workloads/admin
+  - ../../../local/workloads/booking-core
+  - ../../../local/workloads/ai-service
+  - ../../../local/workloads/api-gateway
+  - ../../../local/workloads/content-service
+  - ../../../local/workloads/web
+  - ../../../local/workloads/admin
+images:
+  - name: registry.invalid/badminton-local/booking-core
+    newName: ghcr.io/chiendz11/badminton-booking-core
+    newTag: latest
+  - name: registry.invalid/badminton-local/ai-service
+    newName: ghcr.io/chiendz11/badminton-ai-service
+    newTag: latest
+  - name: registry.invalid/badminton-local/api-gateway
+    newName: ghcr.io/chiendz11/badminton-api-gateway
+    newTag: latest
+  - name: registry.invalid/badminton-local/content-service
+    newName: ghcr.io/chiendz11/badminton-content-service
+    newTag: latest
+  - name: registry.invalid/badminton-local/web
+    newName: ghcr.io/chiendz11/badminton-web
+    newTag: latest
+  - name: registry.invalid/badminton-local/admin
+    newName: ghcr.io/chiendz11/badminton-admin
+    newTag: latest

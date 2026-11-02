@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application-monitoring
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '11'
+    badminton.io/configuration-required: Pin a published app commit before first sync.
+spec:
+  project: badminton-production
+  source:
+    repoURL: https://github.com/chiendz11/badminton_system.git
+    targetRevision: UNCONFIGURED_MONITORING_COMMIT
+    path: monitoring/chart
+    helm:
+      releaseName: badminton-monitoring
+      valuesObject:
+        environment: production
+        workloadNamespace: badminton
+        monitoringRelease: monitoring
+        dashboards:
+          enabled: true
+          namespace: monitoring
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: badminton
+  syncPolicy:
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
