@@ -4,6 +4,11 @@ namespace: badminton
 resources:
 - postgres.yaml
 - mongo.yaml
+- redis.yaml
+- rabbitmq.yaml
+- cluster-secret-store.yaml
+- ingress.yaml
+- network-policies.yaml
 configMapGenerator:
 - name: postgres-init-script
   files:

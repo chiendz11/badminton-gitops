@@ -4,6 +4,9 @@ namespace: badminton
 resources:
 - deployment.yaml
 - service.yaml
+- hpa.yaml
+- pdb.yaml
+- external-secret.yaml
 configMapGenerator:
 - name: booking-core-config
   literals:

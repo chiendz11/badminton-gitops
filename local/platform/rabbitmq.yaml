@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: badminton
+  labels:
+    app: rabbitmq
+    badminton.io/part-of: badminton-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+        badminton.io/part-of: badminton-local
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: amqp
+          containerPort: 5672
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        readinessProbe:
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 15
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: badminton
+  labels:
+    app: rabbitmq
+    badminton.io/part-of: badminton-local
+spec:
+  ports:
+  - name: amqp
+    port: 5672
+    targetPort: 5672
+  selector:
+    app: rabbitmq

@@ -4,6 +4,8 @@ namespace: badminton
 resources:
 - deployment.yaml
 - service.yaml
+- hpa.yaml
+- pdb.yaml
 configMapGenerator:
 - name: content-service-config
   literals:
