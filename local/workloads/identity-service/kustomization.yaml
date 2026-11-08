@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: badminton
+resources:
+- deployment.yaml
+- service.yaml
+- hpa.yaml
+- pdb.yaml
+configMapGenerator:
+- name: identity-service-config
+  literals:
+  - PORT=8084
+  - NODE_ENV=development
+  - DATABASE_URL=postgresql://identity:identity_dev@postgres:5432/identity?connect_timeout=3&pool_timeout=3
+  - JWT_SECRET=local-development-only-change-me-32-chars
+  - JWT_ISSUER=badminton-identity
+  - JWT_AUDIENCE=badminton-system
+generatorOptions:
+  disableNameSuffixHash: true

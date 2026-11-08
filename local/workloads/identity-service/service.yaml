@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-service
+  namespace: badminton
+  labels:
+    app: identity-service
+    badminton.io/part-of: badminton-local
+spec:
+  selector:
+    app: identity-service
+  ports:
+  - name: http
+    port: 8084
+    targetPort: 8084

@@ -27,7 +27,7 @@ spec:
           containerPort: 80
         env:
         - name: API_GATEWAY_URL
-          value: http://127.0.0.1:18081
+          value: http://api-gateway:8081
         readinessProbe:
           httpGet:
             path: /

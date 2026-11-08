@@ -13,6 +13,7 @@ configMapGenerator:
   - PORT=8081
   - NODE_ENV=development
   - BOOKING_CORE_URL=http://booking-core:3000
+  - IDENTITY_SERVICE_URL=http://identity-service:8084
   - CONTENT_SERVICE_URL=http://content-service:3001
   - CONTENT_UPSTREAM_TIMEOUT_MS=5000
   - AI_SERVICE_URL=http://ai-service:8000

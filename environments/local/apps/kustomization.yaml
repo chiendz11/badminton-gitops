@@ -6,6 +6,7 @@ resources:
 - ../../../local/workloads/ai-service
 - ../../../local/workloads/api-gateway
 - ../../../local/workloads/content-service
+- ../../../local/workloads/identity-service
 - ../../../local/workloads/web
 - ../../../local/workloads/admin
 images:
@@ -21,6 +22,9 @@ images:
 - name: registry.invalid/badminton-local/content-service
   newName: ghcr.io/chiendz11/badminton-content-service
   newTag: sha-5ea10752e3fdfa82c3aa7f47365ebe058df43db5
+- name: registry.invalid/badminton-local/identity-service
+  newName: ghcr.io/chiendz11/badminton-identity-service
+  newTag: latest
 - name: registry.invalid/badminton-local/web
   newName: ghcr.io/chiendz11/badminton-web
   newTag: sha-5ea10752e3fdfa82c3aa7f47365ebe058df43db5
