@@ -27,7 +27,7 @@ spec:
           containerPort: 80
         env:
         - name: API_GATEWAY_URL
-          value: http://api-gateway:8081
+          value: http://api-gateway.badminton.svc.cluster.local:8081
         readinessProbe:
           httpGet:
             path: /
