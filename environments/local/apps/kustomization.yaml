@@ -12,22 +12,22 @@ resources:
 images:
 - name: registry.invalid/badminton-local/booking-core
   newName: ghcr.io/chiendz11/badminton-booking-core
-  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+  newTag: sha-03edd0e93dd14fe37866fb667d55b7edea00bab9
 - name: registry.invalid/badminton-local/ai-service
   newName: ghcr.io/chiendz11/badminton-ai-service
-  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+  newTag: sha-03edd0e93dd14fe37866fb667d55b7edea00bab9
 - name: registry.invalid/badminton-local/api-gateway
   newName: ghcr.io/chiendz11/badminton-api-gateway
-  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+  newTag: sha-03edd0e93dd14fe37866fb667d55b7edea00bab9
 - name: registry.invalid/badminton-local/content-service
   newName: ghcr.io/chiendz11/badminton-content-service
-  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+  newTag: sha-03edd0e93dd14fe37866fb667d55b7edea00bab9
 - name: registry.invalid/badminton-local/identity-service
   newName: ghcr.io/chiendz11/badminton-identity-service
   newTag: latest
 - name: registry.invalid/badminton-local/web
   newName: ghcr.io/chiendz11/badminton-web
-  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+  newTag: sha-03edd0e93dd14fe37866fb667d55b7edea00bab9
 - name: registry.invalid/badminton-local/admin
   newName: ghcr.io/chiendz11/badminton-admin
-  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+  newTag: sha-03edd0e93dd14fe37866fb667d55b7edea00bab9
