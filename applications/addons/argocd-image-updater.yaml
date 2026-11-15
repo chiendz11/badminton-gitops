@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: badminton-argocd-image-updater
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-40'
+spec:
+  project: badminton-production
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argocd-image-updater
+    targetRevision: 1.5.0
+    helm:
+      releaseName: argocd-image-updater
+      valuesObject:
+        serviceAccount:
+          create: true
+          name: argocd-image-updater-controller
+          annotations:
+            eks.amazonaws.com/role-arn: UNCONFIGURED_IMAGE_UPDATER_ROLE_ARN
+        config:
+          gitUser: argocd-image-updater[bot]
+          gitEmail: argocd-image-updater@badminton.invalid
+          interval: 2m
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 5

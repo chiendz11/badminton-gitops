@@ -1,0 +1,102 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: badminton-production-image-updater
+  namespace: argocd
+spec:
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: regexp:^v[0-9]+\.[0-9]+\.[0-9]+$
+    ignoreTags:
+    - latest
+    - NOT_BUILT
+    - unreleased
+  writeBackConfig:
+    method: git:secret:argocd-image-updater-git-creds
+    gitConfig:
+      repository: https://github.com/chiendz11/badminton-gitops.git
+      branch: main
+      writeBackTarget: kustomization
+      pullRequest:
+        github: {}
+        labels:
+        - automated
+        - production-release
+  applicationRefs:
+  - namePattern: badminton-workloads
+    images:
+    - alias: api-gateway
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-api-gateway
+      manifestTargets:
+        kustomize:
+          name: badminton-api-gateway
+    - alias: identity-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-identity-service
+      manifestTargets:
+        kustomize:
+          name: badminton-identity-service
+    - alias: identity-service-migrations
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-identity-service-migrations
+      manifestTargets:
+        kustomize:
+          name: badminton-identity-service-migrations
+    - alias: booking-core
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-booking-core
+      manifestTargets:
+        kustomize:
+          name: badminton-booking-core
+    - alias: booking-core-migrations
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-booking-core-migrations
+      manifestTargets:
+        kustomize:
+          name: badminton-booking-core-migrations
+    - alias: content-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-content-service
+      manifestTargets:
+        kustomize:
+          name: badminton-content-service
+    - alias: ai-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-ai-service
+      manifestTargets:
+        kustomize:
+          name: badminton-ai-service
+    - alias: ai-service-migrations
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-ai-service-migrations
+      manifestTargets:
+        kustomize:
+          name: badminton-ai-service-migrations
+    - alias: commerce-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-commerce-service
+      manifestTargets:
+        kustomize:
+          name: badminton-commerce-service
+    - alias: commerce-service-migrations
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-commerce-service-migrations
+      manifestTargets:
+        kustomize:
+          name: badminton-commerce-service-migrations
+    - alias: social-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-social-service
+      manifestTargets:
+        kustomize:
+          name: badminton-social-service
+    - alias: notification-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-notification-service
+      manifestTargets:
+        kustomize:
+          name: badminton-notification-service
+    - alias: storage-service
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-storage-service
+      manifestTargets:
+        kustomize:
+          name: badminton-storage-service
+    - alias: web
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-web
+      manifestTargets:
+        kustomize:
+          name: badminton-web
+    - alias: admin
+      imageName: 000000000000.dkr.ecr.ap-southeast-1.amazonaws.com/badminton-admin
+      manifestTargets:
+        kustomize:
+          name: badminton-admin

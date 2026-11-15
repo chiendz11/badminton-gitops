@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: content-service
-        image: registry.invalid/badminton-local/content-service:latest
+        image: registry.invalid/badminton-local/content-service:NOT_BUILT
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -29,7 +29,7 @@ spec:
         - configMapRef:
             name: content-service-config
         - secretRef:
-            name: jwt-secret
+            name: content-service-secrets
         startupProbe:
           tcpSocket:
             port: http

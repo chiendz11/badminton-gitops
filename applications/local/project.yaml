@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: badminton-local
+  namespace: argocd
+spec:
+  description: Badminton Manager V2 local k3d environment
+  sourceRepos:
+  - https://github.com/chiendz11/badminton-gitops.git
+  destinations:
+  - namespace: badminton
+    server: https://kubernetes.default.svc
+  - namespace: argocd
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  - group: external-secrets.io
+    kind: ClusterSecretStore
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'

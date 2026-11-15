@@ -1,38 +1,42 @@
 # badminton-gitops
 
-Kubernetes desired state for Badminton Manager V2. Argo CD reconciles reviewed `main`; app CI publishes images and infrastructure supplies non-secret platform metadata. Neither producer deploys production using kubectl.
+Pure Declarative Kubernetes desired state for **Badminton Manager V2**, refactored along the `MaintAI-gitops` Kustomize + Argo CD Image Updater v1.5.0 PR-based deployment pattern.
 
-## Delivered
+Application code and builds: [`chiendz11/badminton_system`](https://github.com/chiendz11/badminton_system).
+Infrastructure and Argo CD bootstrap: [`chiendz11/badminton-infras`](https://github.com/chiendz11/badminton-infras).
 
-- **Local Development / Demo GitOps (`environments/local`)**: Kustomize packages for k3d cluster local platform (PostgreSQL datastores) and local workloads (`booking-core`, `ai-service`, `api-gateway`, `web`, `admin`) following the MaintAI pattern.
-- AppProject and App-of-Apps with ordered platform/workload sync waves.
-- Namespace ownership, External Secrets/ClusterSecretStore, monitoring, metrics-server, AWS LB Controller, ExternalDNS, cert-manager, gp3 StorageClass, default-deny policies and Argo monitoring.
-- Production manifests for web, admin, API gateway, identity, booking, commerce, social, content, notification, storage and AI, plus one public ALB Ingress.
-- Per-workload Deployment, ServiceAccount, internal Service, generated ConfigMap, HPA/PDB and NetworkPolicy. Backends have their own ExternalSecret; database services have ordered PreSync migration Jobs. Application ServiceMonitor/rules/dashboard definitions come from the app-owned monitoring chart, pinned by a separate Argo Application.
-- Strict platform and release contracts; deterministic metadata/image renderers; CI/signature provenance verification; release/reconcile/recovery PR workflows; structural CI policies.
+```text
+bootstrap/
+├── local/               # Local Root Application -> applications/local
+└── production/          # Production Root Application -> applications
+applications/
+├── addons/              # Production Helm add-ons (ESO, Image Updater v1.5.0, LBC, ExternalDNS, Cert-Manager, Metrics Server, Monitoring)
+├── local/               # Local AppProject, platform & apps Applications, ImageUpdater CR (GHCR sha-* -> GitHub PR)
+├── project.yaml         # Production AppProject
+├── image-updater.yaml   # Production ImageUpdater CR (ECR digest -> GitHub PR)
+└── *.yaml               # Production child Argo CD Applications (namespaces, storage, network, secret-store, observability, workloads, edge)
+environments/
+├── local/               # Local k3d overlays (platform, apps, applications)
+└── production/          # AWS EKS workloads (11 services + edge Ingress; default unreleased until ECR & secrets are configured)
+local/
+├── platform/            # Local PostgreSQL (booking/ai/identity), MongoDB, Redis, RabbitMQ, Ingress, NetworkPolicies
+└── workloads/           # Local manifests for active services (api-gateway, identity-service, booking-core, content-service, ai-service, web, admin)
+platform/                # Shared prod cluster resources (namespaces, gp3 StorageClass, default-deny NetworkPolicies, ClusterSecretStore, ServiceMonitor)
+docs/                    # Architecture, Bootstrap, Local Development, GitHub Actions, Recovery, Security
+```
 
+## Ownership Boundary
 
-## Initial state
+- **`badminton_system`**: Application source code, Dockerfiles, migrations, and image builds pushed to GHCR / ECR with immutable `sha-<40>` / release tags. Never commits directly into `badminton-gitops`.
+- **`badminton-gitops` (this repo)**: Pure Declarative Kubernetes YAML only (zero Python compilers, JSON release state generators, or committed `kind: Secret` objects). Image tag updates are proposed via **Argo CD Image Updater Pull Requests** against `main`.
+- **`badminton-infras`**: Terraform 4-root AWS infrastructure (`bootstrap`, `domain`, `platform`, `argocd`), SSM metadata handoff (`/badminton/prod/platform-metadata`), Local `k3d` + LocalStack + `ClusterSecretStore`, and `argocd-image-updater-git-creds` PAT provisioning.
 
-`state/production-platform.json` starts with `configured: false`. Add-ons requiring real AWS metadata and all workload Applications start without automated sync. Initial `unreleased` image markers are allowed only while their Application is disabled; they are not fabricated production digests.
+## Quick Links
 
-First merge a real platform reconcile PR, which enables the platform Applications. Then merge signed image-release PRs per service, which pin immutable digests and enable that service. Edge is automatically enabled when web/admin/gateway/social all have reviewed image releases. Disabled child Applications are deliberately treated as healthy by the Terraform-installed Argo health customization so they do not block unrelated platform phases.
-
-The `application-monitoring` Application also starts with `UNCONFIGURED_MONITORING_COMMIT` and no automated sync. Publish the app chart and pin its full commit SHA before first sync; rules and dashboards are no longer copied into workload directories.
-
-Do not manually sync an unconfigured/unreleased Application. No tests, Kustomize build, kubeconform, cluster deployment or workflow runs were executed during implementation, per the user's request. CI definitions are available for later PRs; they are not execution evidence.
-
-## Documentation
-
-- [Local Development & Demo GitOps](docs/LOCAL_DEVELOPMENT.md)
-- [Bootstrap and ownership](docs/BOOTSTRAP.md)
-- [Platform and release contracts](docs/CONTRACTS.md)
-- [Release producer integration](docs/RELEASE_INTEGRATION.md)
-- [GitHub workflow configuration](docs/GITHUB_ACTIONS.md)
-- [Network and secret boundaries](docs/SECURITY.md)
-- [Recovery](docs/RECOVERY.md)
-- [Detailed implementation report](docs/IMPLEMENTATION_DETAILS.md)
-- [Application-owned monitoring and first chart release](docs/APPLICATION_MONITORING.md)
-- [Original GitOps guide](BADMINTON_GITOPS_IMPLEMENTATION.md)
-
-The existing app implements web/admin/gateway/booking/AI. The other six Applications are deployment contracts for future app services and remain disabled until they have real images. App-level idempotency, Redis adapters, route handlers, read-only Booking tools and metrics instrumentation belong to the app repository.
+- Docs Index: [docs/README.md](docs/README.md)
+- Repo Boundaries: [AGENTS.md](AGENTS.md)
+- Local Development: [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md)
+- Production Bootstrap: [docs/BOOTSTRAP.md](docs/BOOTSTRAP.md)
+- CI & Validations: [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md)
+- Recovery: [docs/RECOVERY.md](docs/RECOVERY.md)
+- Security: [docs/SECURITY.md](docs/SECURITY.md)

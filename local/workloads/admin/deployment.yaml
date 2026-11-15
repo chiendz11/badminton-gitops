@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: admin
-        image: registry.invalid/badminton-local/admin:latest
+        image: registry.invalid/badminton-local/admin:NOT_BUILT
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

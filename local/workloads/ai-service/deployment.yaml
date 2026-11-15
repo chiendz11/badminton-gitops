@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: ai-service
-        image: registry.invalid/badminton-local/ai-service:latest
+        image: registry.invalid/badminton-local/ai-service:NOT_BUILT
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

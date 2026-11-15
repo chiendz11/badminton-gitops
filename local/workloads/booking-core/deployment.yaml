@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: booking-core
-        image: registry.invalid/badminton-local/booking-core:latest
+        image: registry.invalid/badminton-local/booking-core:NOT_BUILT
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

@@ -24,7 +24,7 @@ images:
   newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
 - name: registry.invalid/badminton-local/identity-service
   newName: ghcr.io/chiendz11/badminton-identity-service
-  newTag: latest
+  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
 - name: registry.invalid/badminton-local/web
   newName: ghcr.io/chiendz11/badminton-web
   newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29

@@ -1,0 +1,62 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: badminton-local-image-updater
+  namespace: argocd
+spec:
+  commonUpdateSettings:
+    updateStrategy: newest-build
+    allowTags: regexp:^sha-[0-9a-f]{40}$
+    ignoreTags:
+    - latest
+    - NOT_BUILT
+    forceUpdate: true
+  writeBackConfig:
+    method: git:secret:argocd-image-updater-git-creds
+    gitConfig:
+      repository: https://github.com/chiendz11/badminton-gitops.git
+      branch: main
+      writeBackTarget: kustomization
+      pullRequest:
+        github: {}
+        labels:
+        - automated
+        - image-update
+  applicationRefs:
+  - namePattern: badminton-local-apps
+    images:
+    - alias: booking-core
+      imageName: ghcr.io/chiendz11/badminton-booking-core
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/booking-core
+    - alias: ai-service
+      imageName: ghcr.io/chiendz11/badminton-ai-service
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/ai-service
+    - alias: api-gateway
+      imageName: ghcr.io/chiendz11/badminton-api-gateway
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/api-gateway
+    - alias: content-service
+      imageName: ghcr.io/chiendz11/badminton-content-service
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/content-service
+    - alias: identity-service
+      imageName: ghcr.io/chiendz11/badminton-identity-service
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/identity-service
+    - alias: web
+      imageName: ghcr.io/chiendz11/badminton-web
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/web
+    - alias: admin
+      imageName: ghcr.io/chiendz11/badminton-admin
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/admin

@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: badminton-storage
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-55'
+spec:
+  project: badminton-production
+  source:
+    repoURL: https://github.com/chiendz11/badminton-gitops.git
+    targetRevision: main
+    path: platform/storage
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

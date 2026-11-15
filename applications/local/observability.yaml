@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: badminton-local-observability
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-5'
+spec:
+  project: badminton-local
+  source:
+    repoURL: https://github.com/chiendz11/badminton-gitops.git
+    targetRevision: main
+    path: environments/local/observability
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: badminton
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

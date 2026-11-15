@@ -1,0 +1,198 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus-discovery
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus-discovery
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: badminton
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-discovery
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - name: http
+    port: 9090
+    targetPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+spec:
+  selector:
+    app: grafana
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+spec:
+  replicas: 1
+  serviceName: prometheus
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      automountServiceAccountToken: true
+      securityContext:
+        fsGroup: 65534
+      containers:
+      - name: prometheus
+        image: prom/prometheus:v3.5.0@sha256:63805ebb8d2b3920190daf1cb14a60871b16fd38bed42b857a3182bc621f4996
+        args:
+        - --config.file=/etc/prometheus/prometheus.yaml
+        - --storage.tsdb.path=/prometheus
+        - --storage.tsdb.retention.time=3d
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: data
+          mountPath: /prometheus
+        - name: config
+          mountPath: /etc/prometheus
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: local-prometheus
+      serviceAccountName: prometheus
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+  namespace: badminton
+  labels:
+    badminton.io/part-of: badminton-local
+spec:
+  replicas: 1
+  serviceName: grafana
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 472
+      containers:
+      - name: grafana
+        image: grafana/grafana:12.2.0@sha256:74144189b38447facf737dfd0f3906e42e0776212bf575dc3334c3609183adf7
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: 'true'
+        - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+          value: Admin
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: 'false'
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/grafana
+        - name: datasources
+          mountPath: /etc/grafana/provisioning/datasources
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          periodSeconds: 5
+      volumes:
+      - name: datasources
+        configMap:
+          name: local-grafana-datasources
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 1Gi

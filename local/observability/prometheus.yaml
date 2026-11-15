@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+- job_name: prometheus
+  static_configs:
+  - targets:
+    - 127.0.0.1:9090
+- job_name: badminton-apps
+  kubernetes_sd_configs:
+  - role: pod
+    namespaces:
+      names:
+      - badminton
+  relabel_configs:
+  - source_labels:
+    - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+    action: keep
+    regex: 'true'
+  - source_labels:
+    - __address__
+    - __meta_kubernetes_pod_annotation_prometheus_io_port
+    action: replace
+    regex: ([^:]+)(?::\d+)?;(\d+)
+    replacement: $1:$2
+    target_label: __address__
+  - source_labels:
+    - __meta_kubernetes_pod_label_app
+    target_label: service

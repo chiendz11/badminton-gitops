@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: identity-service
-        image: registry.invalid/badminton-local/identity-service:latest
+        image: registry.invalid/badminton-local/identity-service:NOT_BUILT
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -28,6 +28,8 @@ spec:
         envFrom:
         - configMapRef:
             name: identity-service-config
+        - secretRef:
+            name: identity-service-secrets
         startupProbe:
           httpGet:
             path: /health/ready

@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: api-gateway
-        image: registry.invalid/badminton-local/api-gateway:latest
+        image: registry.invalid/badminton-local/api-gateway:NOT_BUILT
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

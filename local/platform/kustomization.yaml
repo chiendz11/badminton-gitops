@@ -6,7 +6,6 @@ resources:
 - mongo.yaml
 - redis.yaml
 - rabbitmq.yaml
-- cluster-secret-store.yaml
 - ingress.yaml
 - network-policies.yaml
 configMapGenerator:

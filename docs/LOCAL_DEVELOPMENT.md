@@ -1,47 +1,25 @@
-# Badminton GitOps Local Development
+# Local Development — Pure Declarative GitOps (`k3d` + Argo CD)
 
-Tài liệu này mô tả cấu trúc và cách quản lý Desired State cho môi trường **k3d Local Demo** (`badminton-local`) theo chuẩn GitOps tự động kéo image từ GitHub Container Registry (`ghcr.io/chiendz11`).
+Tài liệu này mô tả cấu trúc desired state local trong `badminton-gitops` theo kiến trúc Pure Declarative Kustomize + Argo CD Image Updater v1.5.0.
 
----
+## 1. Cấu trúc Thư mục Local
 
-## 1. Cấu trúc thư mục Local Desired State
+| Đường dẫn trong `badminton-gitops` | Trách nhiệm |
+|---|---|
+| [`bootstrap/local/`](../bootstrap/local/) | Local root `Application` (`badminton-local-root`) trỏ tới `applications/local`. |
+| [`applications/local/`](../applications/local/) | `AppProject` (`badminton-local`), 2 child Argo Applications (`badminton-local-platform`, `badminton-local-apps`), và `ImageUpdater` CR (`badminton-local-image-updater`). |
+| [`local/platform/`](../local/platform/) & [`environments/local/platform/`](../environments/local/platform/) | PostgreSQL (databases `booking`, `ai`, `identity`), MongoDB, Redis, RabbitMQ, Ingress (`web.badminton.local`, `admin.badminton.local`, `api.badminton.local`), NetworkPolicies. *(Lưu ý: `ClusterSecretStore/aws-secrets-manager` do `badminton-infras` sở hữu.)* |
+| [`local/workloads/`](../local/workloads/) & [`environments/local/apps/`](../environments/local/apps/) | 7 microservices hoạt động ở local (`api-gateway`, `identity-service`, `booking-core`, `content-service`, `ai-service`, `web`, `admin`), ExternalSecrets (`LocalStack`), HPA, PDB, và pin tag `sha-<40>` trong [`environments/local/apps/kustomization.yaml`](../environments/local/apps/kustomization.yaml). |
 
-```text
-badminton-gitops/
-├── environments/
-│   ├── production/               # AWS EKS Production (không sửa đổi khi chạy local)
-│   └── local/                    # Khai báo Argo CD Applications local
-│       ├── platform/             # Kustomization cho CSDL PostgreSQL local
-│       └── apps/                 # Kustomization ánh xạ images sang ghcr.io/chiendz11/...:latest
-├── local/
-│   ├── platform/                 # Manifests PostgreSQL (StatefulSet, Service, PVC, script init)
-│   └── workloads/                # Manifests cho từng microservice / frontend
-│       ├── booking-core/
-│       ├── ai-service/
-│       ├── api-gateway/
-│       ├── content-service/
-│       ├── web/
-│       └── admin/
-├── contracts/
-│   └── local-platform-contract-v1.json  # Platform contract khớp với badminton-infras
-└── config/local/
-    └── runtime-catalog.json             # Danh mục runtime của các components
-```
+## 2. Quy trình CI & Image Updater Pull Request
 
----
+1. Khi code trên `badminton_system` (`chiendz11/badminton_system`) merge vào `main`, workflow build đẩy image mới với tag `sha-<40-hex-sha>` lên GHCR (`ghcr.io/chiendz11/badminton-*`).
+2. **Argo CD Image Updater** chạy trong namespace `argocd` polling GHCR theo cấu hình [`applications/local/image-updater.yaml`](../applications/local/image-updater.yaml) (`allowTags: regexp:^sha-[0-9a-f]{40}$`, `forceUpdate: true`, `pullRequest.github: {}`).
+3. Khi phát hiện tag `sha-*` mới hơn, controller tự động mở **Pull Request** cập nhật `environments/local/apps/kustomization.yaml` vào nhánh `main`.
+4. CI [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) chạy `kubectl kustomize` + `kubeconform` + guardrails (zero `Secret`, zero `:latest`).
+5. Sau khi PR được merge vào `main`, Argo CD tự sync cụm `k3d-badminton-local`.
 
-## 2. Kiểm tra tính hợp lệ của Manifests (Dry-run Render)
+## 3. Bảo mật Secrets Local
 
-Bạn có thể render và kiểm tra cú pháp toàn bộ manifests local bằng lệnh:
-
-```bash
-cd /home/chienqt/Dev/newBTL/badminton-gitops
-make validate-local
-```
-
-Hoặc render chi tiết các workloads để kiểm tra image tags GHCR:
-```bash
-make render-apps
-```
-
-Toàn bộ các workloads (`booking-core`, `ai-service`, `api-gateway`, `content-service`, `web`, `admin`) được Kustomize tự động ánh xạ từ `registry.invalid/badminton-local/<component>` sang image phát hành chính thức `ghcr.io/chiendz11/badminton-<component>:latest` để cụm k3d tự động kéo về chạy.
+- Zero plaintext secrets trong ConfigMaps hoặc Git: mọi service (`booking-core`, `ai-service`, `api-gateway`, `identity-service`, `content-service`) đọc secrets từ Kubernetes Secrets được ESO sync từ LocalStack (`ClusterSecretStore/aws-secrets-manager`).
+- `argocd-image-updater-git-creds` được nạp trực tiếp qua CLI `make local-image-updater-pat` trong `badminton-infras`.

@@ -1,31 +1,16 @@
-# Bootstrap and ownership
+# Production & Local Bootstrap
 
-Infrastructure prepares state/OIDC, domain, private cloud/data resources, EKS and Argo CD. Follow `badminton-infras/docs/AWS_DEPLOYMENT.md` before adopting this repository.
+Infrastructure provisions AWS/EKS (`terraform/bootstrap`, `terraform/domain`, `terraform/platform`, `terraform/argocd`) or local `k3d` (`terraform/local`). Follow [badminton-infras/docs/BOOTSTRAP.md](../../badminton-infras/docs/BOOTSTRAP.md) first.
 
-1. Merge the implementation into this repository's main branch after review and configure GitHub workflow credentials/protections.
-2. Obtain a real, validated platform v1 contract from Terraform output. Populate runtime Secrets Manager values and app database users separately; none are passed through the contract.
-3. Invoke `platform-reconcile.yml` with contract JSON or an authorized repository_dispatch event. Review/merge the generated PR. This configures IRSA, chart values, secret ARN references, ingress metadata and managed endpoint-specific policies. It leaves image selections unchanged.
-4. Enable the Terraform root Application only after that platform PR is merged. The root reads `applications` on main.
-5. Publish/sign initial application runtime and, where required, Prisma migration images. Submit one release contract per service. Review/merge each PR. The receiver enables automatic sync for that service only.
-6. Migrations run after the service's PreSync ExternalSecret reports ready and before its Deployment update. Migration failure stops that Application's rollout.
-7. Edge becomes automated once web, admin, gateway and social have approved image releases. Readiness and service health still determine whether ALB can route traffic; an image release alone does not assert application health.
+## Production Order
 
-| Wave | Resource group |
-| --- | --- |
-| -100 | AppProject |
-| -90 | namespaces |
-| -50 / -49 | External Secrets / store configuration |
-| -45 / -44 | metrics-server / gp3 storage |
-| -40 / -39 | monitoring / Argo metrics |
-| -38 / -37 / -36 | AWS LB Controller / ExternalDNS / cert-manager |
-| 0 | shared default-deny policy |
-| 10 | backend Applications |
-| 20 | gateway |
-| 25 | web/admin |
-| 30 | edge |
+1. `terraform/platform` writes non-secret infrastructure metadata (EKS cluster, VPC, KMS, IRSA roles including `image-updater`, RDS/Valkey/RabbitMQ endpoints, ECR repository URIs, and Secrets Manager ARNs) to AWS SSM Parameter Store (`/badminton/prod/platform-metadata`).
+2. Populate out-of-band AWS Secrets Manager runtime values and `argocd-image-updater-git-creds` (Fine-grained PAT for Image Updater PRs on `chiendz11/badminton-gitops`).
+3. Update placeholder values (`UNCONFIGURED_ROLE_ARN`, `UNCONFIGURED_CLUSTER`, `UNCONFIGURED_VPC`, `UNCONFIGURED_ZONE`, ECR repository URIs, endpoints) in `applications/addons/*.yaml`, `applications/image-updater.yaml`, and `environments/production/*/kustomization.yaml` via reviewed PRs on `main`.
+4. Enable `enable_gitops_root = true` in `terraform/argocd` so `badminton-root` reconciles [`applications/`](../applications/).
 
-Within a database Application, hook waves are -20 for the ExternalSecret and -10 for migration. The Argo Helm values in infrastructure include the `ExternalSecret Ready=True` health check. The hooks assume the cluster-wide ESO platform already exists. Disable automatic sync until prerequisites are reviewed. Sync waves do not replace application retries/readiness.
+## Local (`k3d` + LocalStack + Image Updater)
 
-Only `platform/namespaces` declares app/platform Namespace manifests; child roots do not duplicate them. `argocd` is initially created by the infrastructure Helm install and then retained under GitOps namespace desired state. The existing EKS `kube-system` namespace is not recreated by this repository.
-
-Infrastructure owns EKS/EBS CSI/IAM/managed endpoints/ACM. GitOps owns StorageClass/PVC, chart add-ons, workload images/config, policies and alerts. Application code owns runtime correctness and build/publish logic.
+1. Run `terraform -chdir=terraform/local apply` in `badminton-infras` (provisions `k3d-badminton-local`, LocalStack, ESO + `ClusterSecretStore/aws-secrets-manager`, `ingress-nginx`, Argo CD + Argo CD Image Updater v1.5.0, and applies `applications/local`).
+2. Load the Image Updater PAT into the cluster (`GITHUB_PAT=ghp_xxx make local-image-updater-pat` in `badminton-infras`).
+3. Run `make local-migrate` and `make local-status` in `badminton-infras`.
