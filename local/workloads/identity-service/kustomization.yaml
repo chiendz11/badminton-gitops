@@ -5,14 +5,19 @@ resources:
 - deployment.yaml
 - service.yaml
 - external-secret.yaml
+- migration-job.yaml
 - hpa.yaml
 - pdb.yaml
 configMapGenerator:
 - name: identity-service-config
   literals:
   - PORT=8084
-  - NODE_ENV=development
+  - NODE_ENV=production
   - JWT_ISSUER=badminton-identity
   - JWT_AUDIENCE=badminton-system
+  - COOKIE_SECURE=true
+  - TRUST_PROXY=1
+  - MAILPIT_URL=http://mailpit:8025
+  - EMAIL_VERIFICATION_PAGE_URL=https://web.badminton.local/verify-email
 generatorOptions:
   disableNameSuffixHash: true

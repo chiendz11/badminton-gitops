@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: booking-core-migrate
+  namespace: badminton
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: '-10'
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+  labels:
+    app: booking-core
+    badminton.io/part-of: badminton-local
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app: booking-core
+        badminton.io/part-of: badminton-local
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+      - name: migrate
+        image: registry.invalid/badminton-local/booking-core-migrations:NOT_BUILT
+        imagePullPolicy: IfNotPresent
+        command:
+        - pnpm
+        - --filter
+        - '@badminton/booking-core'
+        - prisma:migrate:deploy
+        envFrom:
+        - secretRef:
+            name: booking-core-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 256Mi

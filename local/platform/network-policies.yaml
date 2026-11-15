@@ -274,6 +274,44 @@ spec:
     ports:
     - protocol: TCP
       port: 5432
+  - to:
+    - podSelector:
+        matchLabels:
+          app: mailpit
+    ports:
+    - protocol: TCP
+      port: 8025
+    - protocol: TCP
+      port: 1025
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mailpit-policy
+  namespace: badminton
+spec:
+  podSelector:
+    matchLabels:
+      app: mailpit
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: identity-service
+    ports:
+    - protocol: TCP
+      port: 8025
+    - protocol: TCP
+      port: 1025
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8025
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

@@ -4,9 +4,19 @@ metadata:
   name: badminton-ingress
   namespace: badminton
   annotations:
-    kubernetes.io/ingress.class: alb
+    cert-manager.io/cluster-issuer: badminton-local-ca
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
 spec:
-  ingressClassName: alb
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - web.badminton.local
+    - badminton.local
+    - admin.badminton.local
+    - api.badminton.local
+    - mailpit.badminton.local
+    secretName: badminton-local-tls
   rules:
   - host: web.badminton.local
     http:
@@ -69,3 +79,13 @@ spec:
             name: api-gateway
             port:
               number: 8081
+  - host: mailpit.badminton.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mailpit
+            port:
+              number: 8025

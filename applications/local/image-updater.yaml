@@ -30,6 +30,11 @@ spec:
       manifestTargets:
         kustomize:
           name: registry.invalid/badminton-local/booking-core
+    - alias: booking-core-migrations
+      imageName: ghcr.io/chiendz11/badminton-booking-core-migrations
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/booking-core-migrations
     - alias: ai-service
       imageName: ghcr.io/chiendz11/badminton-ai-service
       manifestTargets:
@@ -50,6 +55,11 @@ spec:
       manifestTargets:
         kustomize:
           name: registry.invalid/badminton-local/identity-service
+    - alias: identity-service-migrations
+      imageName: ghcr.io/chiendz11/badminton-identity-service-migrations
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/identity-service-migrations
     - alias: web
       imageName: ghcr.io/chiendz11/badminton-web
       manifestTargets:

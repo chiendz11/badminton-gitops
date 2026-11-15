@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: badminton-local-cert-manager
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-40'
+spec:
+  project: badminton-local
+  source:
+    repoURL: https://charts.jetstack.io
+    targetRevision: v1.21.2
+    chart: cert-manager
+    helm:
+      releaseName: cert-manager
+      valuesObject:
+        crds:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

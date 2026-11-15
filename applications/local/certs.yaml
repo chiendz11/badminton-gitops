@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: badminton-local-certs
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-35'
+spec:
+  project: badminton-local
+  source:
+    repoURL: https://github.com/chiendz11/badminton-gitops.git
+    targetRevision: main
+    path: local/certs
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

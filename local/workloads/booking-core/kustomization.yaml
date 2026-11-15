@@ -7,6 +7,7 @@ resources:
 - hpa.yaml
 - pdb.yaml
 - external-secret.yaml
+- migration-job.yaml
 configMapGenerator:
 - name: booking-core-config
   literals:
@@ -16,6 +17,6 @@ configMapGenerator:
   - JWT_ISSUER=badminton-identity
   - JWT_AUDIENCE=badminton-system
   - ENABLE_DEMO_AUTH=true
-  - CORS_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:8082,http://localhost:8083,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:8082,http://127.0.0.1:8083,http://127.0.0.1:18082,http://127.0.0.1:18083
+  - CORS_ORIGINS=https://web.badminton.local,https://admin.badminton.local,http://localhost:5173,http://localhost:5174,http://localhost:8082,http://localhost:8083,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:8082,http://127.0.0.1:8083,http://127.0.0.1:18082,http://127.0.0.1:18083
 generatorOptions:
   disableNameSuffixHash: true

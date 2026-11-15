@@ -13,6 +13,9 @@ images:
 - name: registry.invalid/badminton-local/booking-core
   newName: ghcr.io/chiendz11/badminton-booking-core
   newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+- name: registry.invalid/badminton-local/booking-core-migrations
+  newName: ghcr.io/chiendz11/badminton-booking-core-migrations
+  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
 - name: registry.invalid/badminton-local/ai-service
   newName: ghcr.io/chiendz11/badminton-ai-service
   newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
@@ -24,6 +27,9 @@ images:
   newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
 - name: registry.invalid/badminton-local/identity-service
   newName: ghcr.io/chiendz11/badminton-identity-service
+  newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
+- name: registry.invalid/badminton-local/identity-service-migrations
+  newName: ghcr.io/chiendz11/badminton-identity-service-migrations
   newTag: sha-a0940fc849429d63feea480d70c7f49d60243a29
 - name: registry.invalid/badminton-local/web
   newName: ghcr.io/chiendz11/badminton-web
