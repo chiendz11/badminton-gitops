@@ -45,6 +45,7 @@ jobs:
           platform/storage
           platform/policies
           platform/external-secrets-config
+          platform/secrets
           platform/argocd-monitoring
         )
         mkdir -p "${RUNNER_TEMP}/rendered"

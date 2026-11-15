@@ -6,7 +6,7 @@ Read [README.md](README.md), [docs/README.md](docs/README.md), and [docs/BOOTSTR
 
 1. **Pure Declarative Kustomize Only**: This repository holds only Kubernetes/Kustomize YAML, Argo CD `Application` / `AppProject` / `ImageUpdater` manifests, and documentation. Do not reintroduce Python compilers, JSON release-state generators, or shell deployment scripts.
 2. **Never Commit Sensitive Material**: Never commit `kind: Secret` YAML manifests, passwords, PATs, TLS keys, or API keys.
-   - `argocd-image-updater-git-creds` (Fine-grained PAT for Image Updater PR creation) is provisioned directly into `argocd` via `badminton-infras` CLI (`python3 -m localdev image-updater-pat`) or AWS Secrets Manager.
+   - `argocd-image-updater-git-creds` (Fine-grained PAT for Image Updater PR creation) is synced into the `argocd` namespace via External Secrets Operator (`ExternalSecret` reading `badminton/prod/argocd-image-updater-git-creds` via `ClusterSecretStore/aws-secrets-manager-argocd` from LocalStack in local dev or AWS Secrets Manager in production; seeded out-of-band via `badminton-infras` CLI `python3 -m localdev image-updater-pat`).
    - All runtime credentials flow through External Secrets Operator (`ExternalSecret` -> `ClusterSecretStore/aws-secrets-manager`).
 3. **Pull Request Discipline for Image Updates**:
    - Application CI pushes immutable images (`sha-<40>` / semver tags) to GHCR / ECR and does not commit directly to `badminton-gitops`.

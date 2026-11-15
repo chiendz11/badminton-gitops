@@ -22,4 +22,4 @@ Tài liệu này mô tả cấu trúc desired state local trong `badminton-gitop
 ## 3. Bảo mật Secrets Local
 
 - Zero plaintext secrets trong ConfigMaps hoặc Git: mọi service (`booking-core`, `ai-service`, `api-gateway`, `identity-service`, `content-service`) đọc secrets từ Kubernetes Secrets được ESO sync từ LocalStack (`ClusterSecretStore/aws-secrets-manager`).
-- `argocd-image-updater-git-creds` được nạp trực tiếp qua CLI `make local-image-updater-pat` trong `badminton-infras`.
+- `argocd-image-updater-git-creds` được nạp vào LocalStack Secrets Manager (`badminton/prod/argocd-image-updater-git-creds`) qua CLI `make local-image-updater-pat` (hoặc tự đọc từ `../PAT.txt` `0600`) trong `badminton-infras`, rồi ESO `ExternalSecret` ([`applications/local/image-updater-git-creds.yaml`](../applications/local/image-updater-git-creds.yaml)) đồng bộ vào Secret `argocd/argocd-image-updater-git-creds` giống hệt Production.

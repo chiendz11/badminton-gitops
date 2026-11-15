@@ -6,6 +6,7 @@ resources:
 - storage.yaml
 - network.yaml
 - secret-store.yaml
+- image-updater-git-creds.yaml
 - observability.yaml
 - workloads.yaml
 - edge.yaml

@@ -6,3 +6,4 @@ resources:
 - observability.yaml
 - apps.yaml
 - image-updater.yaml
+- image-updater-git-creds.yaml
