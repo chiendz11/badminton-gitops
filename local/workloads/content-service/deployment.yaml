@@ -17,6 +17,7 @@ spec:
         app: content-service
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: content-service
       automountServiceAccountToken: false
       containers:
       - name: content-service

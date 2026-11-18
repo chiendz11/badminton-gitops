@@ -17,6 +17,7 @@ spec:
         app: ai-service
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: ai-service
       automountServiceAccountToken: false
       containers:
       - name: ai-service

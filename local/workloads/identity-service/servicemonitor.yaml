@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: identity-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: identity-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    authorization:
+      type: Bearer
+      credentials:
+        name: identity-service-secrets
+        key: METRICS_TOKEN

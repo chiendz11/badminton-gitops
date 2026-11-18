@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: commerce-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: commerce-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    authorization:
+      type: Bearer
+      credentials:
+        name: commerce-service-secrets
+        key: METRICS_TOKEN

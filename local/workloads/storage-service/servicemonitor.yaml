@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: storage-service
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: storage-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    authorization:
+      type: Bearer
+      credentials:
+        name: storage-service-secrets
+        key: METRICS_TOKEN

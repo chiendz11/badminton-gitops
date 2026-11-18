@@ -17,6 +17,7 @@ spec:
         app: identity-service
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: identity-service
       automountServiceAccountToken: false
       containers:
       - name: identity-service

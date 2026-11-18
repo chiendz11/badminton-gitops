@@ -17,6 +17,7 @@ spec:
         app: web
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: web
       automountServiceAccountToken: false
       containers:
       - name: web

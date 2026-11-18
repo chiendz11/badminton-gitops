@@ -17,6 +17,7 @@ spec:
         app: booking-core
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: booking-core
       automountServiceAccountToken: false
       containers:
       - name: booking-core
