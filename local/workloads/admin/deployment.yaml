@@ -17,6 +17,7 @@ spec:
         app: admin
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: admin
       automountServiceAccountToken: false
       containers:
       - name: admin

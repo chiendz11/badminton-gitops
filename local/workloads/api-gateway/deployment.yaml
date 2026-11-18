@@ -17,6 +17,7 @@ spec:
         app: api-gateway
         badminton.io/part-of: badminton-local
     spec:
+      serviceAccountName: api-gateway
       automountServiceAccountToken: false
       containers:
       - name: api-gateway

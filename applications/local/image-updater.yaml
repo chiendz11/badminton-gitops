@@ -40,6 +40,11 @@ spec:
       manifestTargets:
         kustomize:
           name: registry.invalid/badminton-local/ai-service
+    - alias: ai-service-migrations
+      imageName: ghcr.io/chiendz11/badminton-ai-service
+      manifestTargets:
+        kustomize:
+          name: registry.invalid/badminton-local/ai-service-migrations
     - alias: api-gateway
       imageName: ghcr.io/chiendz11/badminton-api-gateway
       manifestTargets:

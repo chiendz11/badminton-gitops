@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: commerce-service-migrate
+  namespace: badminton
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: '-10'
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+  labels:
+    app: commerce-service
+    badminton.io/part-of: badminton-local
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app: commerce-service
+        badminton.io/part-of: badminton-local
+    spec:
+      restartPolicy: Never
+      serviceAccountName: commerce-service
+      automountServiceAccountToken: false
+      containers:
+      - name: migrate
+        image: registry.invalid/badminton-local/commerce-service-migrations:NOT_BUILT
+        imagePullPolicy: IfNotPresent
+        command:
+        - pnpm
+        - --filter
+        - '@badminton/commerce-service'
+        - prisma:migrate:deploy
+        envFrom:
+        - configMapRef:
+            name: commerce-service-config
+        - secretRef:
+            name: commerce-service-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 256Mi

@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: booking-core
+  namespace: badminton
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: booking-core
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    authorization:
+      type: Bearer
+      credentials:
+        name: booking-core-secrets
+        key: METRICS_TOKEN

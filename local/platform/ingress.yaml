@@ -28,6 +28,20 @@ spec:
             name: api-gateway
             port:
               number: 8081
+      - path: /graphql
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8081
+      - path: /socket.io
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8081
       - path: /
         pathType: Prefix
         backend:
@@ -45,6 +59,20 @@ spec:
             name: api-gateway
             port:
               number: 8081
+      - path: /graphql
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8081
+      - path: /socket.io
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8081
       - path: /
         pathType: Prefix
         backend:
@@ -56,6 +84,20 @@ spec:
     http:
       paths:
       - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8081
+      - path: /graphql
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8081
+      - path: /socket.io
         pathType: Prefix
         backend:
           service:

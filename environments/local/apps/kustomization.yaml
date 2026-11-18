@@ -9,6 +9,11 @@ resources:
 - ../../../local/workloads/identity-service
 - ../../../local/workloads/web
 - ../../../local/workloads/admin
+# Enabled once Docker image is published on GHCR:
+# - ../../../local/workloads/commerce-service
+# - ../../../local/workloads/social-service
+# - ../../../local/workloads/notification-service
+# - ../../../local/workloads/storage-service
 images:
 - name: registry.invalid/badminton-local/booking-core
   newName: ghcr.io/chiendz11/badminton-booking-core
@@ -17,6 +22,9 @@ images:
   newName: ghcr.io/chiendz11/badminton-booking-core-migrations
   newTag: sha-4f0e5a89b8c430a43b7b3b8449f6e7eb4be11b80
 - name: registry.invalid/badminton-local/ai-service
+  newName: ghcr.io/chiendz11/badminton-ai-service
+  newTag: sha-4f0e5a89b8c430a43b7b3b8449f6e7eb4be11b80
+- name: registry.invalid/badminton-local/ai-service-migrations
   newName: ghcr.io/chiendz11/badminton-ai-service
   newTag: sha-4f0e5a89b8c430a43b7b3b8449f6e7eb4be11b80
 - name: registry.invalid/badminton-local/api-gateway

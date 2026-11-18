@@ -15,197 +15,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: api-gateway-policy
-  namespace: badminton
-spec:
-  podSelector:
-    matchLabels:
-      app: api-gateway
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: ingress-nginx
-    - podSelector:
-        matchLabels:
-          app: web
-    - podSelector:
-        matchLabels:
-          app: admin
-    ports:
-    - protocol: TCP
-      port: 8081
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
-  - to:
-    - podSelector:
-        matchLabels:
-          app: booking-core
-    ports:
-    - protocol: TCP
-      port: 3000
-  - to:
-    - podSelector:
-        matchLabels:
-          app: ai-service
-    ports:
-    - protocol: TCP
-      port: 8000
-  - to:
-    - podSelector:
-        matchLabels:
-          app: content-service
-    ports:
-    - protocol: TCP
-      port: 3001
-  - to:
-    - podSelector:
-        matchLabels:
-          app: identity-service
-    ports:
-    - protocol: TCP
-      port: 8084
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: ai-service-policy
-  namespace: badminton
-spec:
-  podSelector:
-    matchLabels:
-      app: ai-service
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: api-gateway
-    ports:
-    - protocol: TCP
-      port: 8000
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
-  - to:
-    - podSelector:
-        matchLabels:
-          app: booking-core
-    ports:
-    - protocol: TCP
-      port: 3000
-  - to:
-    - podSelector:
-        matchLabels:
-          app: postgres
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - podSelector:
-        matchLabels:
-          app: redis
-    ports:
-    - protocol: TCP
-      port: 6379
-  - to:
-    - ipBlock:
-        cidr: 0.0.0.0/0
-        except:
-        - 10.0.0.0/8
-        - 172.16.0.0/12
-        - 192.168.0.0/16
-    ports:
-    - protocol: TCP
-      port: 443
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: booking-core-policy
-  namespace: badminton
-spec:
-  podSelector:
-    matchLabels:
-      app: booking-core
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: api-gateway
-    - podSelector:
-        matchLabels:
-          app: ai-service
-    ports:
-    - protocol: TCP
-      port: 3000
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
-  - to:
-    - podSelector:
-        matchLabels:
-          app: postgres
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - podSelector:
-        matchLabels:
-          app: redis
-    ports:
-    - protocol: TCP
-      port: 6379
-  - to:
-    - podSelector:
-        matchLabels:
-          app: rabbitmq
-    ports:
-    - protocol: TCP
-      port: 5672
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
   name: database-policy
   namespace: badminton
 spec:
@@ -232,57 +41,19 @@ spec:
           app: identity-service
     - podSelector:
         matchLabels:
-          app: api-gateway
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: identity-service-policy
-  namespace: badminton
-spec:
-  podSelector:
-    matchLabels:
-      app: identity-service
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
+          app: commerce-service
+    - podSelector:
+        matchLabels:
+          app: social-service
+    - podSelector:
+        matchLabels:
+          app: notification-service
+    - podSelector:
+        matchLabels:
+          app: storage-service
     - podSelector:
         matchLabels:
           app: api-gateway
-    ports:
-    - protocol: TCP
-      port: 8084
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
-  - to:
-    - podSelector:
-        matchLabels:
-          app: postgres
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - podSelector:
-        matchLabels:
-          app: mailpit
-    ports:
-    - protocol: TCP
-      port: 8025
-    - protocol: TCP
-      port: 1025
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -300,6 +71,9 @@ spec:
     - podSelector:
         matchLabels:
           app: identity-service
+    - podSelector:
+        matchLabels:
+          app: notification-service
     ports:
     - protocol: TCP
       port: 8025
