@@ -20,20 +20,17 @@ spec:
         badminton.io/part-of: badminton-local
     spec:
       restartPolicy: Never
-      serviceAccountName: commerce-service
       automountServiceAccountToken: false
       containers:
       - name: migrate
         image: registry.invalid/badminton-local/commerce-service-migrations:NOT_BUILT
         imagePullPolicy: IfNotPresent
         command:
-        - pnpm
-        - --filter
-        - '@badminton/commerce-service'
-        - prisma:migrate:deploy
+        - node
+        - node_modules/prisma/build/index.js
+        - migrate
+        - deploy
         envFrom:
-        - configMapRef:
-            name: commerce-service-config
         - secretRef:
             name: commerce-service-secrets
         resources:
