@@ -20,7 +20,6 @@ spec:
         badminton.io/part-of: badminton-local
     spec:
       restartPolicy: Never
-      serviceAccountName: ai-service
       automountServiceAccountToken: false
       containers:
       - name: migrate
@@ -31,8 +30,6 @@ spec:
         - -c
         - alembic upgrade head && python -m app.migrate
         envFrom:
-        - configMapRef:
-            name: ai-service-config
         - secretRef:
             name: ai-service-secrets
         resources:
